@@ -104,11 +104,9 @@ void build_node(int value, tree_type* bst)
         new_node->data = value;
         if(on->data > value)// values less than parent go to left
         {
-            printf("\non data:%d", on->data);
             on->left = new_node;
         }else if(on->data < value)// values greater than parent go to right
         {
-            printf("\non data:%d", on->data);
             on->right = new_node;
         }
         new_node->left = 0l;
@@ -237,7 +235,6 @@ int depth_check(tree_type* bst)
         if(count > depth)
         {
             depth = count;
-            printf("\nnew deepest:%d", on->data);
         }
     }
     printf("\ndepth:%d", depth);
@@ -246,12 +243,28 @@ int depth_check(tree_type* bst)
 
 void user_input(tree_type *bst)
 {
-    int value = 0;
+    int value;
     while(1)
-    { 
-    printf("\nEnter node value:");
-    scanf("%d", &value);
-    build_node(value, bst);
+    {
+        value = 0;
+        printf("\nEnter node value:");
+        if(scanf("%d", &value) != 0)
+        {
+            if(value < 2147483648 && value > -2147483648)
+            {
+                build_node(value, bst);
+                user_input(bst);
+            }else
+            {
+                printf("\nOut of range!");
+                user_input(bst);
+            }
+        }else
+        {
+            printf("Non Numerical Input!");
+            fflush(stdin);
+            user_input(bst);
+        }
     }
 }
 
@@ -279,6 +292,7 @@ int main()
     sort_array(bst_array, arr_len);
     build_tree(bst_array, arr_len, bst);
 
+    user_input(bst);
     user_input(bst);
     return 0;
 }
