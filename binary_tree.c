@@ -23,7 +23,7 @@ void get_rand(int i, int* arr, int arr_len)//assigns a unique random integer to 
 {
     count++;
     int x = 0;
-    arr[i] = rand() % (int)sizeof(bst_array); //assigns the random integer the range is proportional to the size of the array for no particular reason
+    arr[i] = rand() % ((int)sizeof(bst_array)*4); //assigns the random integer the range is proportional to the size of the array for no particular reason
 
         while(x < i)
         {
@@ -61,6 +61,7 @@ void sort_array(int* arr, int arr_len)
     int temp = 0;
     int value = 0;
     int min_index = 0;
+    printf("unsorted array:");
     print_array(arr, arr_len);//print before
     for(int i = 0; i < arr_len - 1; i++) //iterate through array
     {
@@ -76,6 +77,7 @@ void sort_array(int* arr, int arr_len)
         }
         
     }
+    printf("sorted array:");
     print_array(arr, arr_len);//print after to show difference
 
 
@@ -121,7 +123,7 @@ void build_tree(int* arr, int arr_len, tree_type* bst)
     int denom = 0;
     int temp = 0;
     int count = 0;
-    for(int i = 0; i < (sqrt(arr_len))-1; i++)
+    for(int i = 0; i < (sqrt(arr_len))-1; i++)//builds each item in the array by dividing the array length by denom(2^i) mulitplied by x(numerater, odd numbers only) add one to offset array index starting at 0
     {
         printf("\n\ni:%d test:%d\n\n", i, arr_len);
         denom = pow(2, i + 1) ;
@@ -131,35 +133,30 @@ void build_tree(int* arr, int arr_len, tree_type* bst)
             if(i == 0)
             {
                 printf("\n\n%d/%d building index %d into node %d", x, denom, (arr_len*x)/denom, count);
-                build_root(arr[((arr_len/denom)*x)+1], bst); 
+                build_root(arr[((arr_len/denom)*x)+1], bst);  
                 count++;  
             }else
             {
                 printf("\n\n%d/%d building index %d into node %d", x, denom, (arr_len*x)/denom, count);
                 build_node(arr[((arr_len/denom)*x)-1], bst);
                 count++;
-                //build node
-                //search for node in tree
-                //when find null assign left or right to node
-                //ASSIGN LEFT AND RIGHT AS NULL YOU NUMB SKULL
-                //can iterate through entire tree if you search for each value from 1 to the greatest value which is root->left->left(til null)
             }
         }
         
     }
 }
 
-int search_tree(int target_value, tree_type* bst, node_type **output) //searching for a null value where target_value is supposed to be
+int search_tree(int target_value, tree_type* bst, node_type **output) //searching for a null value where target_value is would be found
 {
+    //uses a pointer (output) to return the node where the target goes 
     printf("\n searching tree for %d", target_value);
     node_type *on = bst->root;
     int depth = depth_check(bst);
-    for(int i =0; i <= depth; i++)//5 is max depth for this tree change to depth when get depth working
+    for(int i =0; i <= depth; i++)
     {
         printf("\non node:%d", on->data);
         if(target_value < on->data)
         {
-            //printf("\n %d is less than %d moving left", target_value, on->data);
             if(on->left == 0l)
             {
                 printf("\nFound where %d goes, it goes It goes to the left of %d",target_value, on->data);
@@ -169,11 +166,9 @@ int search_tree(int target_value, tree_type* bst, node_type **output) //searchin
             {
                 on = on->left;
                 *output = on;                
-                //printf("\nmoving left");
             }
         }else if(target_value > on->data)
         {
-            //printf("\n %d is greater than %d right %p", target_value, on->data, on->right);
             if(on->right == 0l)
             {
                 printf("\nFound where %d goes, it goes It goes to the right of %d",target_value, on->data);
@@ -181,13 +176,12 @@ int search_tree(int target_value, tree_type* bst, node_type **output) //searchin
                 return 0;
             }else
             {
-                //printf("\nmoving right");
                 on = on->right;
                 *output = on;
             }
         } else if(target_value == on->data)
         {
-            return 1;//Return 1 when the value is found
+            return 1;//Return 1 if the target value is found
         }
     }
 }
@@ -195,40 +189,30 @@ int search_tree(int target_value, tree_type* bst, node_type **output) //searchin
 
 
 
-void remove_node()
-{
-    //remove a node then call sortTree()
-}
 
-int depth_check(tree_type* bst)
+
+int depth_check(tree_type* bst)//searches for iterated numbers in bst to find the longest path to the bottom 
 {
     int depth = 5;
     int count = 1;
     node_type* on = bst->root;
     int top = find_top(bst);//finds the highest value to search for
-    //printf("%p", &on->left);
-    //printf("%d", on->data);
-    for(int i = 0; i < top; i++)//MAKE IT FIND THE FUCKING VALUE YOU DUMBASS
+    for(int i = 0; i < top; i++)
     {
-        //printf("\nsearching for %d", i);
         count = 1;
         on = bst->root;
-        //printf("\nDepth:%d", depth);
         for(int x = 0; x < depth; x++)
         {
-            if(i < on->data && on->left != 0l)//if on->left is null then it has hit the bottom
+            if(i < on->data && on->left != 0l)//if on->left or on->right is null then it has hit the bottom
             {   
-                //printf("\nMoving left, %d nodes deep", count);
                 on = on->left;
                 count++;
             }else if(i > on->data && on->right != 0l)
             {
-                //printf("\nMoving right, %d nodes deep", count);
                 on = on->right;
                 count++;
             }else if(i  == on->data)
             {
-                //printf("\nfound %d at %d nodes deep", i, count);
                 break;
             }
         }
@@ -248,27 +232,28 @@ void user_input(tree_type *bst)
     {
         value = 0;
         printf("\nEnter node value:");
-        if(scanf("%d", &value) != 0)
+        if(scanf("%d", &value) != 0)//only executes if returned an integer
         {
-            if(value < 2147483648 && value > -2147483648)
+            if(value < 2147483648 && value > 0)//only stops things from 2^32/2 to 2^32
             {
                 build_node(value, bst);
                 user_input(bst);
             }else
             {
                 printf("\nOut of range!");
+                fflush(stdin);//flush scanf buffer after bad input
                 user_input(bst);
             }
         }else
         {
-            printf("Non Numerical Input!");
-            fflush(stdin);
+            printf("Non Integer Input!");
+            fflush(stdin);//flush scanf buffer after bad input
             user_input(bst);
         }
     }
 }
 
-int find_top(tree_type *bst)
+int find_top(tree_type *bst)//returns the rightmost node
 {
     int count = 0;
     node_type* on = bst->root;
@@ -280,6 +265,10 @@ int find_top(tree_type *bst)
     return on->data;
 }
 
+int update_array(tree_type *bst, int value, int arr)
+{
+
+}
 
 int main()
 {
@@ -292,7 +281,6 @@ int main()
     sort_array(bst_array, arr_len);
     build_tree(bst_array, arr_len, bst);
 
-    user_input(bst);
     user_input(bst);
     return 0;
 }
