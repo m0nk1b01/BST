@@ -248,7 +248,7 @@ void user_input(tree_type *bst)
 {
     int value = 0;
     while(1)
-    {
+    { 
     printf("\nEnter node value:");
     scanf("%d", &value);
     build_node(value, bst);
