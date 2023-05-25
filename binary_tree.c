@@ -93,7 +93,7 @@ void build_root(int value, tree_type* bst)
     printf("\nCreated root node, data:%d\n", bst->root->data);
 }
 
-void build_node(int value, tree_type* bst)
+void build_node(int value, tree_type* bst, int* arr)
 {
     node_type* on = bst->root;//send pointer into search tree, then edit the data at "on"
     int x = search_tree(value, bst, &on);
@@ -138,7 +138,7 @@ void build_tree(int* arr, int arr_len, tree_type* bst)
             }else
             {
                 printf("\n\n%d/%d building index %d into node %d", x, denom, (arr_len*x)/denom, count);
-                build_node(arr[((arr_len/denom)*x)-1], bst);
+                build_node(arr[((arr_len/denom)*x)-1], bst, arr);
                 count++;
             }
         }
@@ -225,7 +225,7 @@ int depth_check(tree_type* bst)//searches for iterated numbers in bst to find th
     return depth;
 }
 
-void user_input(tree_type *bst)
+void user_input(tree_type *bst, int* arr)
 {
     int value;
     while(1)
@@ -236,19 +236,20 @@ void user_input(tree_type *bst)
         {
             if(value < 2147483648 && value > 0)//only stops things from 2^32/2 to 2^32
             {
-                build_node(value, bst);
-                user_input(bst);
+                build_node(value, bst, arr);
+                update_array(bst, value, arr);
+                user_input(bst, arr);
             }else
             {
                 printf("\nOut of range!");
                 fflush(stdin);//flush scanf buffer after bad input
-                user_input(bst);
+                user_input(bst, arr);
             }
         }else
         {
             printf("Non Integer Input!");
             fflush(stdin);//flush scanf buffer after bad input
-            user_input(bst);
+            user_input(bst, arr);
         }
     }
 }
@@ -265,9 +266,25 @@ int find_top(tree_type *bst)//returns the rightmost node
     return on->data;
 }
 
-int update_array(tree_type *bst, int value, int arr)
+int update_array(tree_type *bst, int value, int* arr)
 {
-
+    int arr_len = sizeof(arr)/sizeof(arr[0]);   
+    int temp = 0;
+    print_array(bst_array, arr_len);
+    for(int i = 0; i < arr_len; i++)
+    {
+        if(value > arr[i] && value < arr[i+1])
+        {
+            temp = arr[i+1];
+            for(int x = i; x < arr_len - i; x++)
+            {
+                arr[x] = temp;
+                temp = arr[x+1];
+            }
+            break;
+        }
+    }
+    print_array(arr, arr_len);
 }
 
 int main()
@@ -281,6 +298,6 @@ int main()
     sort_array(bst_array, arr_len);
     build_tree(bst_array, arr_len, bst);
 
-    user_input(bst);
+    user_input(bst, bst_array);
     return 0;
 }
